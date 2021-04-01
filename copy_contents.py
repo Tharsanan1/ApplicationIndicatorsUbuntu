@@ -52,7 +52,7 @@ def build_menu():
     return menu
 
 def copy_trace_pass_impl():
-    password = "95L?f=6Fm3n-"
+    password = os.getenv('TRACE_SERVER_PASSWORD')
     return "Copied " + password
 
 def copy_trace_pass(_):
