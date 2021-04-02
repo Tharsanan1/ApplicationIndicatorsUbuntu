@@ -22,6 +22,7 @@ password = ''
 def getpwd():
     global password
     root = Tk()
+    root.eval('tk::PlaceWindow . center')
     pwdbox = Entry(root, show = '*')
     pwdbox.focus_set()
     def onpwdentry(evt):
@@ -45,10 +46,14 @@ def getpwd():
 
 def showError(msg):
     root = Tk()
+    root.eval('tk::PlaceWindow . center')
     Label(root, text = msg).pack(side = 'top')
     def onokclick():
         root.destroy()
-    Button(root, command=onokclick, text = 'OK').pack(side = 'top')
+    def returnClick(args):
+        root.destroy()
+    btn  = Button(root, command=onokclick, text = 'OK').pack(side = 'top')
+    root.bind("<Return>", returnClick)
     root.mainloop()
     return
 
@@ -146,17 +151,20 @@ def build_menu():
 def copy_trace_pass_impl():
     password = os.getenv('TRACE_SERVER_PASSWORD')
     pyperclip.copy(password)
-    return "Copied " + password
+    return "Copied " 
 
 def copy_trace_pass(_):
-    notify.Notification.new("Success", copy_trace_pass_impl(), None).show()
+    info = notify.Notification.new("Success", copy_trace_pass_impl(), None)
+    info.set_timeout(500)
+    info.set_urgency(1)
+    info.show()
 
 
 
 def copy_totp_dev_impl():
     password = os.getenv('DEV_PASSWORD') + str(get_totp_token(os.getenv('TOTP_DEV_SECRET'))).zfill(6)
     pyperclip.copy(password)
-    return "Copied " + password
+    return "Copied. time left " + str(30 - int(time.time())%30) + "s" 
 
 def copy_totp_dev(_):
     notify.Notification.new("Success", copy_totp_dev_impl(), None).show()
@@ -166,7 +174,7 @@ def copy_totp_dev(_):
 def copy_totp_gateway_impl():
     password = os.getenv('PAYMENT_PASSWORD') + str(get_totp_token(os.getenv('TOTP_PAYMENT_SECRET'))).zfill(6)
     pyperclip.copy(password)
-    return "Copied " + password
+    return "Copied. time left " + str(30 - int(time.time())%30) + "s" 
 
 def copy_totp_gateway(_):
     notify.Notification.new("Success", copy_totp_gateway_impl(), None).show()
