@@ -14,14 +14,6 @@ from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
 
 from os.path import join, dirname
-from dotenv import load_dotenv
- 
-# Create .env file path.
-dotenv_path = join(dirname(__file__), '.env')
-print("path : " + dotenv_path)
-# Load file from the path.
-load_dotenv(dotenv_path)
-
 
 
 APPINDICATOR_ID = 'openfolderindicator'
@@ -56,6 +48,10 @@ def build_menu():
     item_open_configs_folder.connect('activate', open_configs_folder)
     menu.append(item_open_configs_folder)
 
+    item_open_projects_folder = gtk.MenuItem('Open Projects folder')
+    item_open_projects_folder.connect('activate', open_projects_folder)
+    menu.append(item_open_projects_folder)
+
     item_quit = gtk.MenuItem('Quit')
     item_quit.connect('activate', quit)
     menu.append(item_quit)
@@ -79,22 +75,12 @@ def open_postman_folder(_):
 def open_configs_folder(_):
     subprocess.call("nautilus /home/tharsanan/EnactorHome/configs/web_shop_2_6", shell=True)
 
-
+def open_projects_folder(_):
+    subprocess.call("nautilus /home/tharsanan/Projects", shell=True)
 
 def quit(_):
     notify.uninit()
     gtk.main_quit()
-
-def get_hotp_token(secret, intervals_no):
-    key = base64.b32decode(secret + '========'[:len(secret)%8], True)
-    msg = struct.pack(">Q", intervals_no)
-    h = hmac.new(key, msg, hashlib.sha1).digest()
-    o = h[19] & 15
-    h = (struct.unpack(">I", h[o:o+4])[0] & 0x7fffffff) % 1000000
-    return h
-
-def get_totp_token(secret):
-    return get_hotp_token(secret, intervals_no=int(time.time())//30)
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
